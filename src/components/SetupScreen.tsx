@@ -1,4 +1,5 @@
-import { BookOpenIcon, Code2Icon, PlayIcon, RotateCcwIcon, AlertCircleIcon } from 'lucide-react';
+import { BookOpenIcon, PlayIcon, RotateCcwIcon, AlertCircleIcon } from 'lucide-react';
+import { GithubIcon } from '@/components/icons/github-icon';
 import { useApp } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -53,7 +54,7 @@ export function SetupScreen({
 
   return (
     <div className="flex w-full min-w-0 flex-col gap-4">
-    <div className="grid w-full min-w-0 gap-4 lg:grid-cols-[1fr_280px]">
+      <div className="grid w-full min-w-0 gap-4 lg:grid-cols-[1fr_280px]">
       <Card>
         <CardHeader>
           <CardTitle>{ui.setupTitle}</CardTitle>
@@ -167,11 +168,11 @@ export function SetupScreen({
           </CardFooter>
         </Card>
       )}
-    </div>
+      </div>
       <div className="flex justify-center">
         <Badge
           variant="outline"
-          className="touch-target h-8 px-3 text-sm"
+          className="touch-target"
           render={
             <a
               href={REPO_URL}
@@ -181,7 +182,7 @@ export function SetupScreen({
             />
           }
         >
-          <Code2Icon data-icon="inline-start" />
+          <GithubIcon data-icon="inline-start" />
           {ui.openSource}
         </Badge>
       </div>
