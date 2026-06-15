@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { CheckCircle2Icon, XCircleIcon } from 'lucide-react';
 import type { McqQuestion } from '@/data/questions';
@@ -14,21 +14,34 @@ import { Alert, AlertTitle } from '@/components/ui/alert';
 
 type Props = {
   questions: McqQuestion[];
+  mode?: 'quiz' | 'review';
   initialIndex?: number;
   initialCorrect?: number;
   initialWrong?: number;
-  onFinish: (correct: number, wrong: number) => void;
-  onProgress: (index: number, correct: number, wrong: number) => void;
+  onFinish: (correct: number, wrong: number, wrongKeys: string[], correctKeys: string[]) => void;
+  onProgress: (
+    index: number,
+    correct: number,
+    wrong: number,
+    sessionCorrect: string[],
+    sessionWrong: string[],
+  ) => void;
 };
 
 export function QuizScreen({
   questions,
+  mode = 'quiz',
   initialIndex = 0,
   initialCorrect = 0,
   initialWrong = 0,
+  initialSessionCorrect = [],
+  initialSessionWrong = [],
   onFinish,
   onProgress,
-}: Props) {
+}: Props & {
+  initialSessionCorrect?: string[];
+  initialSessionWrong?: string[];
+}) {
   const { ui, settings } = useApp();
   const reduceMotion = useReducedMotion();
   const [index, setIndex] = useState(initialIndex);
@@ -42,12 +55,21 @@ export function QuizScreen({
   const total = questions.length;
 
   useEffect(() => {
-    onProgress(index, correct, wrong);
+    onProgress(
+      index,
+      correct,
+      wrong,
+      sessionCorrectKeysRef.current,
+      sessionWrongKeysRef.current,
+    );
   }, [index, correct, wrong, onProgress]);
 
   function isCorrectChoice(chosenIdx: number, tfValue?: number) {
     return isTf ? tfValue === q.a : chosenIdx === q.a;
   }
+
+  const sessionWrongKeysRef = useRef<string[]>(initialSessionWrong);
+  const sessionCorrectKeysRef = useRef<string[]>(initialSessionCorrect);
 
   function handleAnswer(chosenIdx: number, tfValue?: number) {
     if (answered) return;
@@ -55,15 +77,22 @@ export function QuizScreen({
     setSelectedIdx(chosenIdx);
     if (isCorrectChoice(chosenIdx, tfValue)) {
       setCorrect((c) => c + 1);
+      sessionCorrectKeysRef.current.push(q.q);
       celebrateCorrect();
     } else {
       setWrong((w) => w + 1);
+      sessionWrongKeysRef.current.push(q.q);
     }
   }
 
   function goNext() {
     if (index + 1 >= total) {
-      onFinish(correct, wrong);
+      onFinish(
+        correct,
+        wrong,
+        sessionWrongKeysRef.current,
+        sessionCorrectKeysRef.current,
+      );
       return;
     }
     setIndex((i) => i + 1);
@@ -91,8 +120,12 @@ export function QuizScreen({
   return (
     <QuestionLayout
       progress={((index + (answered ? 1 : 0)) / total) * 100}
-      progressLabel={ui.progressLabel}
-      counter={ui.questionOf(index + 1, total)}
+      progressLabel={mode === 'review' ? ui.reviewProgressLabel : ui.progressLabel}
+      counter={
+        mode === 'review'
+          ? `${ui.questionOf(index + 1, total)} ${ui.reviewRound}`
+          : ui.questionOf(index + 1, total)
+      }
       correct={correct}
       wrong={wrong}
       correctLabel={ui.correct}

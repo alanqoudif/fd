@@ -5,7 +5,9 @@ import {
   addHistoryEntry,
   clearQuizProgress,
   loadSettings,
+  mergeReviewQueue,
   saveSettings,
+  updateReviewQueueAfterReview,
   type AppSettings,
   type ExplainLang,
   type QuizProgress,
@@ -19,6 +21,8 @@ type AppContextValue = {
   setLastLessonTab: (id: LessonId) => void;
   saveProgress: (progress: QuizProgress | null) => void;
   recordResult: (correct: number, wrong: number, total: number) => void;
+  addToReviewQueue: (wrongKeys: string[]) => void;
+  updateReviewQueue: (sessionCorrect: string[]) => void;
   resetCache: () => void;
 };
 
@@ -44,6 +48,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const pct = Math.round((correct / total) * 100);
         addHistoryEntry({ correct, wrong, total, pct });
         persist({ quizProgress: null });
+      },
+      addToReviewQueue: (wrongKeys) => {
+        if (wrongKeys.length === 0) return;
+        persist({ reviewQueue: mergeReviewQueue(settings.reviewQueue, wrongKeys) });
+      },
+      updateReviewQueue: (sessionCorrect) => {
+        persist({
+          reviewQueue: updateReviewQueueAfterReview(settings.reviewQueue, sessionCorrect),
+          quizProgress: null,
+        });
       },
       resetCache: () => {
         localStorage.removeItem('hardware-quiz-v2');

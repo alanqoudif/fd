@@ -1,4 +1,4 @@
-import { BookOpenIcon, PlayIcon, RotateCcwIcon } from 'lucide-react';
+import { BookOpenIcon, PlayIcon, RotateCcwIcon, AlertCircleIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +17,7 @@ type Props = {
   onSelectCount: (n: number) => void;
   onStartQuiz: () => void;
   onResumeQuiz: () => void;
+  onStartReview: () => void;
   onOpenConvert: () => void;
 };
 
@@ -27,10 +28,14 @@ export function SetupScreen({
   onSelectCount,
   onStartQuiz,
   onResumeQuiz,
+  onStartReview,
   onOpenConvert,
 }: Props) {
   const { settings, ui, setQuestionCount, resetCache } = useApp();
-  const hasProgress = settings.quizProgress !== null;
+  const progress = settings.quizProgress;
+  const hasQuizProgress = progress !== null && progress.mode === 'quiz';
+  const hasReviewProgress = progress !== null && progress.mode === 'review';
+  const reviewCount = settings.reviewQueue.length;
   const bestScore = settings.history.length
     ? Math.max(...settings.history.map((h) => h.pct))
     : null;
@@ -73,14 +78,35 @@ export function SetupScreen({
             <PlayIcon data-icon="inline-start" />
             {ui.startQuiz}
           </Button>
-          {hasProgress && (
+          {hasQuizProgress && (
             <Button className="w-full" variant="secondary" size="lg" onClick={onResumeQuiz}>
               <RotateCcwIcon data-icon="inline-start" />
               {ui.resumeQuiz}
             </Button>
           )}
-          {hasProgress && (
+          {hasQuizProgress && (
             <p className="text-center text-xs text-muted-foreground">{ui.resumeHint}</p>
+          )}
+          {hasReviewProgress && (
+            <Button className="w-full" variant="secondary" size="lg" onClick={onResumeQuiz}>
+              <RotateCcwIcon data-icon="inline-start" />
+              {ui.resumeReview}
+            </Button>
+          )}
+          {hasReviewProgress && (
+            <p className="text-center text-xs text-muted-foreground">{ui.resumeReviewHint}</p>
+          )}
+          {reviewCount > 0 && !hasReviewProgress && (
+            <Button className="w-full" variant="secondary" size="lg" onClick={onStartReview}>
+              <AlertCircleIcon data-icon="inline-start" />
+              {ui.reviewWrong}
+              <Badge variant="destructive" className="ms-1">
+                {reviewCount}
+              </Badge>
+            </Button>
+          )}
+          {reviewCount > 0 && !hasReviewProgress && (
+            <p className="text-center text-xs text-muted-foreground">{ui.pendingReview(reviewCount)}</p>
           )}
           <Button className="w-full" variant="outline" onClick={onOpenConvert}>
             <BookOpenIcon data-icon="inline-start" />
@@ -89,7 +115,7 @@ export function SetupScreen({
         </CardFooter>
       </Card>
 
-      {(settings.history.length > 0 || hasProgress) && (
+      {(settings.history.length > 0 || hasQuizProgress || hasReviewProgress || reviewCount > 0) && (
         <Card size="sm">
           <CardHeader>
             <CardTitle>{ui.statsTitle}</CardTitle>

@@ -42,6 +42,17 @@ type Strings = {
   trueFalse: string;
   mcq: string;
   solutionFallback: (answer: string) => string;
+  reviewWrong: string;
+  reviewWrongHint: (n: number) => string;
+  resumeReview: string;
+  resumeReviewHint: string;
+  reviewProgressLabel: string;
+  reviewRound: string;
+  reviewResultsTitle: string;
+  reviewMastered: (n: number) => string;
+  reviewRemaining: (n: number) => string;
+  reviewAllDone: string;
+  pendingReview: (n: number) => string;
   reviewLesson: string;
 };
 
@@ -89,6 +100,17 @@ const UI: Record<'ar' | 'en', Strings> = {
     mcq: 'اختيار من متعدد',
     solutionFallback: (a) => `الإجابة الصحيحة: ${a}`,
     reviewLesson: 'راجع قسم الشرح للطريقة المناسبة.',
+    reviewWrong: 'راجع الأسئلة اللي غلطت فيها',
+    reviewWrongHint: (n) => `${n} سؤال يحتاج مراجعة`,
+    resumeReview: 'متابعة مراجعة الأخطاء',
+    resumeReviewHint: 'في مراجعة محفوظة — تقدر تكمل من حيث توقفت',
+    reviewProgressLabel: 'تقدم المراجعة',
+    reviewRound: '(مراجعة)',
+    reviewResultsTitle: 'نتيجة المراجعة',
+    reviewMastered: (n) => `أتقنت ${n} سؤال من هذه الجولة`,
+    reviewRemaining: (n) => `${n} سؤال باقي للمراجعة`,
+    reviewAllDone: 'ممتاز! ما في أسئلة باقية للمراجعة',
+    pendingReview: (n) => `${n} سؤال محفوظ للمراجعة`,
   },
   en: {
     appTitle: 'Computer Hardware Quiz',
@@ -133,6 +155,17 @@ const UI: Record<'ar' | 'en', Strings> = {
     mcq: 'MCQ',
     solutionFallback: (a) => `Correct answer: ${a}`,
     reviewLesson: 'Review the lesson section for the appropriate method.',
+    reviewWrong: 'Review wrong answers',
+    reviewWrongHint: (n) => `${n} question${n === 1 ? '' : 's'} to review`,
+    resumeReview: 'Resume error review',
+    resumeReviewHint: 'Saved review — continue where you left off',
+    reviewProgressLabel: 'Review progress',
+    reviewRound: '(Review)',
+    reviewResultsTitle: 'Review results',
+    reviewMastered: (n) => `Mastered ${n} question${n === 1 ? '' : 's'} this round`,
+    reviewRemaining: (n) => `${n} question${n === 1 ? '' : 's'} left to review`,
+    reviewAllDone: 'Great! No questions left to review',
+    pendingReview: (n) => `${n} saved for review`,
   },
 };
 

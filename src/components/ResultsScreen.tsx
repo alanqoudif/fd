@@ -1,4 +1,4 @@
-import { TrophyIcon } from 'lucide-react';
+import { TrophyIcon, RotateCcwIcon } from 'lucide-react';
 import { getGradeMessage } from '@/i18n/translations';
 import { useApp } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -16,16 +16,29 @@ type Props = {
   correct: number;
   wrong: number;
   total: number;
+  isReview?: boolean;
+  reviewRemaining?: number;
   onRestart: () => void;
+  onReviewWrong?: () => void;
 };
 
-export function ResultsScreen({ correct, wrong, total, onRestart }: Props) {
+export function ResultsScreen({
+  correct,
+  wrong,
+  total,
+  isReview = false,
+  reviewRemaining = 0,
+  onRestart,
+  onReviewWrong,
+}: Props) {
   const { settings, ui } = useApp();
   const pct = Math.round((correct / total) * 100);
+  const showReview = !isReview && wrong > 0 && onReviewWrong;
+  const showContinueReview = isReview && reviewRemaining > 0 && onReviewWrong;
 
   return (
     <Card className="mx-auto w-full max-w-md text-center">
-      <h2 className="sr-only">{ui.resultsTitle}</h2>
+      <h2 className="sr-only">{isReview ? ui.reviewResultsTitle : ui.resultsTitle}</h2>
       <CardHeader className="items-center gap-2">
         <div
           className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground"
@@ -45,12 +58,43 @@ export function ResultsScreen({ correct, wrong, total, onRestart }: Props) {
           <StatBox label={ui.total} value={total} variant="secondary" />
         </div>
         <Separator />
-        <p className="rounded-lg border bg-muted/50 p-4 text-sm text-pretty" aria-live="polite">
-          {getGradeMessage(pct, settings.explainLang)}
-        </p>
+        {isReview ? (
+          <div className="flex flex-col gap-2 text-sm">
+            <p className="rounded-lg border bg-muted/50 p-4 text-pretty">
+              {ui.reviewMastered(correct)}
+            </p>
+            <p className="text-muted-foreground">
+              {reviewRemaining > 0 ? ui.reviewRemaining(reviewRemaining) : ui.reviewAllDone}
+            </p>
+          </div>
+        ) : (
+          <p className="rounded-lg border bg-muted/50 p-4 text-sm text-pretty" aria-live="polite">
+            {getGradeMessage(pct, settings.explainLang)}
+          </p>
+        )}
+        {showReview && (
+          <p className="text-sm text-muted-foreground">{ui.reviewWrongHint(wrong)}</p>
+        )}
       </CardContent>
-      <CardFooter className="border-t-0 bg-transparent pt-0">
-        <Button className="touch-target w-full" size="lg" onClick={onRestart}>
+      <CardFooter className="flex flex-col gap-2 border-t-0 bg-transparent pt-0">
+        {showReview && (
+          <Button className="touch-target w-full" size="lg" onClick={onReviewWrong}>
+            <RotateCcwIcon data-icon="inline-start" />
+            {ui.reviewWrong}
+          </Button>
+        )}
+        {showContinueReview && (
+          <Button className="touch-target w-full" size="lg" onClick={onReviewWrong}>
+            <RotateCcwIcon data-icon="inline-start" />
+            {ui.reviewWrong}
+          </Button>
+        )}
+        <Button
+          className="touch-target w-full"
+          size="lg"
+          variant={showReview || showContinueReview ? 'outline' : 'default'}
+          onClick={onRestart}
+        >
           {ui.newQuiz}
         </Button>
       </CardFooter>
