@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import type { McqQuestion } from '@/data/questions';
 import type { ExplainLang } from '@/utils/storage';
 import { buildSolution } from '@/utils/conversion';
@@ -17,44 +17,40 @@ type Props = {
 };
 
 export function VisualExplanation({ question, lang, title, show }: Props) {
+  const reduceMotion = useReducedMotion();
   const visual = getVisualExplanation(question, lang);
   const textSolution = buildSolution(question, lang);
 
   if (!show) return null;
 
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.35, ease: 'easeOut' }}
-        >
-          <Card className="border-dashed">
-            <CardHeader>
-              <CardTitle className="text-sm">{title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {visual ? (
-                <VisualRenderer visual={visual} lang={lang} />
-              ) : (
-                <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-                  {textSolution.map((block, bi) => (
-                    <div key={bi} className="flex flex-col gap-1">
-                      {block.title && <strong className="text-foreground">{block.title}</strong>}
-                      {block.lines.map((line, li) => (
-                        <div key={li}>{line}</div>
-                      ))}
-                    </div>
+    <motion.div
+      initial={{ opacity: 0, y: reduceMotion ? 0 : 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reduceMotion ? 0 : 0.25, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <Card className="border-dashed">
+        <CardHeader>
+          <CardTitle className="text-sm">{title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {visual ? (
+            <VisualRenderer visual={visual} lang={lang} />
+          ) : (
+            <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+              {textSolution.map((block, bi) => (
+                <div key={bi} className="flex flex-col gap-1">
+                  {block.title && <strong className="text-foreground">{block.title}</strong>}
+                  {block.lines.map((line, li) => (
+                    <div key={li}>{line}</div>
                   ))}
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-    </AnimatePresence>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 

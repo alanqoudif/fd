@@ -1,15 +1,15 @@
 import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeftIcon, CheckCircle2Icon, XCircleIcon } from 'lucide-react';
 import type { McqQuestion } from '@/data/questions';
 import { ALL_QUESTIONS } from '@/data/questions';
 import { useApp } from '@/context/AppContext';
 import { isConversionQuestion, LABELS } from '@/utils/conversion';
-import { cn } from '@/lib/utils';
 import { shuffle } from '@/utils/shuffle';
 import { celebrateCorrect } from '@/utils/celebrate';
 import { QuestionLayout } from '@/components/QuestionLayout';
 import { VisualExplanation } from '@/components/VisualExplanation';
+import { OptionButton } from '@/components/OptionButton';
 import { LESSON_TABS, LessonContent, getLessonTabLabel, type LessonId } from '@/components/Lessons';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -37,7 +37,7 @@ export function ConvertSection({ onBack }: Props) {
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
-        <Button variant="ghost" onClick={onBack}>
+        <Button variant="ghost" className="touch-target" onClick={onBack}>
           <ArrowLeftIcon data-icon="inline-start" />
           {ui.back}
         </Button>
@@ -109,6 +109,7 @@ function ConvertPractice({
   onBackToLearn: () => void;
 }) {
   const { settings, ui } = useApp();
+  const reduceMotion = useReducedMotion();
   const lang = settings.explainLang;
   const [index, setIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
@@ -150,6 +151,7 @@ function ConvertPractice({
   return (
     <QuestionLayout
       progress={((index + (answered ? 1 : 0)) / total) * 100}
+      progressLabel={ui.progressLabel}
       counter={counter}
       correct={correct}
       wrong={wrong}
@@ -165,42 +167,30 @@ function ConvertPractice({
         ) : null
       }
     >
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2" role="group" aria-label={ui.conversion}>
         {q.o.map((opt, i) => {
           const state = !answered ? 'idle' : i === q.a ? 'correct' : selectedIdx === i ? 'wrong' : 'idle';
           return (
-            <Button
+            <OptionButton
               key={opt}
-              type="button"
-              variant="outline"
+              label={opt}
+              letter={LABELS[i]}
+              state={state}
               disabled={answered}
               onClick={() => handleAnswer(i)}
-              className={cn(
-                'touch-target h-auto min-h-11 justify-start px-4 py-3 text-left text-base whitespace-normal sm:text-sm',
-                state === 'correct' && 'border-primary bg-primary/5',
-                state === 'wrong' && 'border-destructive bg-destructive/5',
-              )}
-              dir="ltr"
-            >
-              <span
-                className={cn(
-                  'flex size-7 shrink-0 items-center justify-center rounded-md border text-xs font-semibold',
-                  state === 'correct' && 'border-primary bg-primary text-primary-foreground',
-                  state === 'wrong' && 'border-destructive bg-destructive text-white',
-                )}
-              >
-                {LABELS[i]}
-              </span>
-              <span>{opt}</span>
-            </Button>
+            />
           );
         })}
       </div>
 
       {answered && (
         <>
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            <Alert variant={wasCorrect ? 'default' : 'destructive'}>
+          <motion.div
+            initial={{ opacity: 0, y: reduceMotion ? 0 : 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Alert variant={wasCorrect ? 'default' : 'destructive'} role="status">
               {wasCorrect ? <CheckCircle2Icon /> : <XCircleIcon />}
               <AlertTitle>
                 {wasCorrect

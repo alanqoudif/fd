@@ -25,7 +25,7 @@ export function Hex2BinVisualAnim({ data, lang }: Props) {
       >
         {data.digits.map((d, i) => (
           <motion.div key={i} className="hex-expand-row" variants={fadeUp}>
-            <motion.span className="hex-digit mono" variants={popIn}>
+            <motion.span className="hex-digit" variants={popIn}>
               {d.char}
             </motion.span>
             <motion.span
@@ -37,7 +37,7 @@ export function Hex2BinVisualAnim({ data, lang }: Props) {
               →
             </motion.span>
             <motion.span
-              className="hex-bits mono"
+              className="hex-bits"
               initial={{ opacity: 0, letterSpacing: '0.5em' }}
               animate={{ opacity: 1, letterSpacing: '0.05em' }}
               transition={{ delay: reduce ? 0 : 0.35, duration: 0.5 }}
@@ -62,10 +62,10 @@ export function Hex2BinVisualAnim({ data, lang }: Props) {
         className="visual-result"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: reduce ? 0 : data.digits.length * 0.4 + 0.6, type: 'spring' }}
+        transition={{ delay: reduce ? 0 : data.digits.length * 0.2 + 0.45, duration: reduce ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }}
       >
         <span className="result-label">{L('result')}</span>
-        <span className="result-value mono">{data.result}</span>
+        <span className="result-value">{data.result}</span>
       </motion.div>
     </div>
   );

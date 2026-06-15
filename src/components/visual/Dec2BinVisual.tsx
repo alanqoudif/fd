@@ -58,10 +58,9 @@ export function Dec2BinVisualAnim({ data, lang }: Props) {
               initial={{ opacity: 0, y: 20, scale: 0.5 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{
-                delay: reduce ? 0 : data.divisions.length * 0.4 + 0.5 + i * 0.12,
-                type: 'spring',
-                stiffness: 400,
-                damping: 20,
+                delay: reduce ? 0 : data.divisions.length * 0.25 + 0.35 + i * 0.08,
+                duration: reduce ? 0 : 0.28,
+                ease: [0.16, 1, 0.3, 1],
               }}
             >
               {bit}
@@ -72,10 +71,10 @@ export function Dec2BinVisualAnim({ data, lang }: Props) {
           className="visual-result"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: reduce ? 0 : data.divisions.length * 0.4 + 1.2, type: 'spring' }}
+          transition={{ delay: reduce ? 0 : data.divisions.length * 0.25 + 0.7, duration: reduce ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }}
         >
           <span className="result-label">{L('result')}</span>
-          <span className="result-value mono">{data.result}</span>
+          <span className="result-value">{data.result}</span>
         </motion.div>
       </motion.div>
     </div>

@@ -40,6 +40,11 @@ export function SetupScreen({
     onSelectCount(n);
   }
 
+  function handleClearCache() {
+    if (!window.confirm(ui.clearCacheConfirm)) return;
+    resetCache();
+  }
+
   return (
     <div className="grid w-full min-w-0 gap-4 lg:grid-cols-[1fr_280px]">
       <Card>
@@ -63,8 +68,8 @@ export function SetupScreen({
             ))}
           </ToggleGroup>
         </CardContent>
-        <CardFooter className="flex flex-col gap-2 border-t-0 bg-transparent p-4 pt-0">
-          <Button className="w-full" size="lg" onClick={onStartQuiz}>
+        <CardFooter className="flex flex-col gap-2 border-t-0 bg-transparent pt-0">
+          <Button className="touch-target w-full" size="lg" onClick={onStartQuiz}>
             <PlayIcon data-icon="inline-start" />
             {ui.startQuiz}
           </Button>
@@ -128,7 +133,7 @@ export function SetupScreen({
             )}
           </CardContent>
           <CardFooter className="border-t-0 bg-transparent">
-            <Button variant="ghost" className="w-full" onClick={resetCache}>
+            <Button className="touch-target w-full" variant="ghost" onClick={handleClearCache}>
               {ui.clearCache}
             </Button>
           </CardFooter>

@@ -1,28 +1,30 @@
 import { useReducedMotion, type Variants } from 'framer-motion';
 
+const easeOut = [0.16, 1, 0.3, 1] as const;
+
 export const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.4, delayChildren: 0.15 },
+    transition: { staggerChildren: 0.12, delayChildren: 0.08 },
   },
 };
 
 export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 12 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.45, ease: 'easeOut' },
+    transition: { duration: 0.28, ease: easeOut },
   },
 };
 
 export const popIn: Variants = {
-  hidden: { opacity: 0, scale: 0.6 },
+  hidden: { opacity: 0, scale: 0.94 },
   show: {
     opacity: 1,
     scale: 1,
-    transition: { type: 'spring', stiffness: 380, damping: 22 },
+    transition: { duration: 0.22, ease: easeOut },
   },
 };
 

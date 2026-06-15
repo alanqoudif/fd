@@ -32,20 +32,20 @@ export function Bin2DecVisualAnim({ data, lang }: Props) {
             variants={fadeUp}
           >
             <motion.span
-              className="bit-char mono"
+              className="bit-char"
               animate={
                 col.active && !reduce
-                  ? { scale: [1, 1.25, 1], color: ['#e8edf5', '#34d399', '#34d399'] }
+                  ? { scale: [1, 1.12, 1] }
                   : {}
               }
-              transition={{ delay: i * 0.15 + 0.5, duration: 0.5 }}
+              transition={{ delay: i * 0.12 + 0.35, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
               {col.bit}
             </motion.span>
-            <span className="bit-power mono">×{col.power}</span>
+            <span className="bit-power">×{col.power}</span>
             {col.active && (
               <motion.span
-                className="bit-val mono"
+                className="bit-val"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: reduce ? 0 : i * 0.15 + 0.7 }}
@@ -63,7 +63,7 @@ export function Bin2DecVisualAnim({ data, lang }: Props) {
         animate={{ opacity: 1 }}
         transition={{ delay: reduce ? 0 : data.columns.length * 0.15 + 0.8 }}
       >
-        <div className="sum-parts mono">
+        <div className="sum-parts">
           {activeCols.map((col, i) => (
             <motion.span
               key={i}
@@ -83,7 +83,7 @@ export function Bin2DecVisualAnim({ data, lang }: Props) {
           transition={{ delay: reduce ? 0 : data.columns.length * 0.15 + 1.8, type: 'spring' }}
         >
           <span className="result-label">{L('sum')}</span>
-          <span className="result-value mono">
+          <span className="result-value">
             {data.sum} <small>({L('decimal')})</small>
           </span>
         </motion.div>

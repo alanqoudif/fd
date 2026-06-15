@@ -1,7 +1,5 @@
 import type { ExplainLang } from '@/utils/storage';
 import { LESSON_TAB_LABELS } from '@/i18n/translations';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const HEX_DIGITS = [
   ['0', '0000'], ['1', '0001'], ['2', '0010'], ['3', '0011'],
@@ -26,21 +24,16 @@ export function getLessonTabLabel(id: LessonId, lang: ExplainLang) {
 function BasicsLesson({ lang }: { lang: ExplainLang }) {
   if (lang === 'en') {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Why are conversions hard without a calculator?</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
+      <div className="lesson-card">
+        <h3>Why are conversions hard without a calculator?</h3>
         <p>
           Because you need <strong>manual division and addition</strong> — but if you memorize a simple table, it becomes easy!
         </p>
-        <Alert>
-          <AlertDescription>
-            <strong>Key tip:</strong> Memorize powers of 2 from 1 to 256 — this is the most important thing for the exam.
-          </AlertDescription>
-        </Alert>
+        <div className="tip-box">
+          <strong>Key tip:</strong> Memorize powers of 2 from 1 to 256 — this is the most important thing for the exam.
+        </div>
         <div className="table-scroll">
-        <table className="w-full min-w-[32rem] border-collapse text-sm [&_td]:border [&_td]:p-2 [&_th]:border [&_th]:bg-muted [&_th]:p-2">
+        <table className="powers-table">
           <thead>
             <tr>
               <th>Position (from right)</th>
@@ -64,8 +57,7 @@ function BasicsLesson({ lang }: { lang: ExplainLang }) {
           <li>Each binary digit = 0 or 1 only</li>
           <li>Each hex digit = 4 binary digits</li>
         </ul>
-        </CardContent>
-      </Card>
+      </div>
     );
   }
 

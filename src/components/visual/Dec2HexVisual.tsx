@@ -19,7 +19,7 @@ export function Dec2HexVisualAnim({ data, lang }: Props) {
     <div className="visual-explain">
       <p className="visual-caption">{L('step1')}</p>
       <motion.div
-        className="binary-strip mono"
+        className="binary-strip"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
@@ -46,7 +46,7 @@ export function Dec2HexVisualAnim({ data, lang }: Props) {
       >
         {data.groups.map((g, i) => (
           <motion.div key={i} className="hex-group" variants={fadeUp}>
-            <span className="group-bits mono">{g.bits}</span>
+            <span className="group-bits">{g.bits}</span>
             <motion.span
               className="group-arrow"
               initial={{ opacity: 0 }}
@@ -56,10 +56,10 @@ export function Dec2HexVisualAnim({ data, lang }: Props) {
               ↓
             </motion.span>
             <motion.span
-              className="group-hex mono"
-              initial={{ opacity: 0, scale: 0.5 }}
+              className="group-hex"
+              initial={{ opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: reduce ? 0 : 0.45, type: 'spring' }}
+              transition={{ delay: reduce ? 0 : 0.35, duration: reduce ? 0 : 0.22, ease: [0.16, 1, 0.3, 1] }}
             >
               {g.hex}
             </motion.span>
@@ -71,10 +71,10 @@ export function Dec2HexVisualAnim({ data, lang }: Props) {
         className="visual-result"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: reduce ? 0 : data.groups.length * 0.4 + 0.5, type: 'spring' }}
+        transition={{ delay: reduce ? 0 : data.groups.length * 0.2 + 0.4, duration: reduce ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }}
       >
         <span className="result-label">{L('result')}</span>
-        <span className="result-value mono">{data.result}</span>
+        <span className="result-value">{data.result}</span>
       </motion.div>
     </div>
   );
