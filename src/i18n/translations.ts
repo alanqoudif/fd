@@ -54,6 +54,8 @@ type Strings = {
   reviewAllDone: string;
   pendingReview: (n: number) => string;
   reviewLesson: string;
+  openSource: string;
+  openSourceAria: string;
 };
 
 const UI: Record<'ar' | 'en', Strings> = {
@@ -111,6 +113,8 @@ const UI: Record<'ar' | 'en', Strings> = {
     reviewRemaining: (n) => `${n} سؤال باقي للمراجعة`,
     reviewAllDone: 'ممتاز! ما في أسئلة باقية للمراجعة',
     pendingReview: (n) => `${n} سؤال محفوظ للمراجعة`,
+    openSource: 'مفتوح المصدر',
+    openSourceAria: 'عرض المشروع على GitHub',
   },
   en: {
     appTitle: 'Computer Hardware Quiz',
@@ -166,6 +170,8 @@ const UI: Record<'ar' | 'en', Strings> = {
     reviewRemaining: (n) => `${n} question${n === 1 ? '' : 's'} left to review`,
     reviewAllDone: 'Great! No questions left to review',
     pendingReview: (n) => `${n} saved for review`,
+    openSource: 'Open Source',
+    openSourceAria: 'View project on GitHub',
   },
 };
 

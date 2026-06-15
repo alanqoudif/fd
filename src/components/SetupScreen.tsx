@@ -1,4 +1,4 @@
-import { BookOpenIcon, PlayIcon, RotateCcwIcon, AlertCircleIcon } from 'lucide-react';
+import { BookOpenIcon, Code2Icon, PlayIcon, RotateCcwIcon, AlertCircleIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +22,7 @@ type Props = {
 };
 
 const COUNTS = [10, 20, 50, 200] as const;
+const REPO_URL = 'https://github.com/alanqoudif/fd';
 
 export function SetupScreen({
   selectedCount,
@@ -51,6 +52,7 @@ export function SetupScreen({
   }
 
   return (
+    <div className="flex w-full min-w-0 flex-col gap-4">
     <div className="grid w-full min-w-0 gap-4 lg:grid-cols-[1fr_280px]">
       <Card>
         <CardHeader>
@@ -165,6 +167,24 @@ export function SetupScreen({
           </CardFooter>
         </Card>
       )}
+    </div>
+      <div className="flex justify-center">
+        <Badge
+          variant="outline"
+          className="touch-target h-8 px-3 text-sm"
+          render={
+            <a
+              href={REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={ui.openSourceAria}
+            />
+          }
+        >
+          <Code2Icon data-icon="inline-start" />
+          {ui.openSource}
+        </Badge>
+      </div>
     </div>
   );
 }
