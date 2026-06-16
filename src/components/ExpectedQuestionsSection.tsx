@@ -1,9 +1,14 @@
 import { useState } from 'react';
-import { ArrowLeftIcon, PlayIcon } from 'lucide-react';
+import { AlertCircleIcon, ArrowLeftIcon, PlayIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { MEMORIZE_CONVERSIONS } from '@/data/expectedQuestions';
-import { buildExpectedQuiz, getAllExpectedQuestions } from '@/utils/expectedQuiz';
+import {
+  buildExpectedQuiz,
+  getAllExpectedQuestions,
+  resolveExpectedQuestions,
+} from '@/utils/expectedQuiz';
 import type { McqQuestion } from '@/data/questions';
+import { mergeReviewQueue, updateReviewQueueAfterReview } from '@/utils/storage';
 import { QuizScreen } from '@/components/QuizScreen';
 import { ResultsScreen } from '@/components/ResultsScreen';
 import { Button } from '@/components/ui/button';
@@ -15,35 +20,96 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Badge } from '@/components/ui/badge';
 
 type Props = { onBack: () => void };
 
 type Mode = 'setup' | 'quiz' | 'results';
+type QuizMode = 'quiz' | 'review';
 
 const COUNTS = [10, 20, 50] as const;
 const TOTAL = getAllExpectedQuestions().length;
 
 export function ExpectedQuestionsSection({ onBack }: Props) {
-  const { ui } = useApp();
+  const { settings, ui, addToExpectedReviewQueue, updateExpectedReviewQueue } = useApp();
   const [mode, setMode] = useState<Mode>('setup');
+  const [quizMode, setQuizMode] = useState<QuizMode>('quiz');
   const [selectedCount, setSelectedCount] = useState<number>(50);
   const [quizKey, setQuizKey] = useState(0);
   const [activeQuestions, setActiveQuestions] = useState<McqQuestion[]>([]);
-  const [results, setResults] = useState({ correct: 0, wrong: 0, total: 0 });
+  const [pendingReviewKeys, setPendingReviewKeys] = useState<string[]>([]);
+  const [results, setResults] = useState({
+    correct: 0,
+    wrong: 0,
+    total: 0,
+    isReview: false,
+    reviewRemaining: 0,
+  });
+
+  const reviewCount = settings.expectedReviewQueue.length;
 
   function startQuiz() {
+    setQuizMode('quiz');
+    setPendingReviewKeys([]);
     const questions = buildExpectedQuiz(selectedCount);
     setActiveQuestions(questions);
     setQuizKey((k) => k + 1);
     setMode('quiz');
   }
 
-  function handleFinish(correct: number, wrong: number) {
-    setResults({ correct, wrong, total: activeQuestions.length });
+  function startReview(keys?: string[]) {
+    const queue = keys ?? settings.expectedReviewQueue;
+    const questions = resolveExpectedQuestions(queue);
+    if (questions.length === 0) return;
+    setQuizMode('review');
+    setActiveQuestions(questions);
+    setQuizKey((k) => k + 1);
+    setMode('quiz');
+  }
+
+  function handleFinish(
+    correct: number,
+    wrong: number,
+    sessionWrong: string[],
+    sessionCorrect: string[],
+  ) {
+    if (quizMode === 'quiz') {
+      const mergedQueue = mergeReviewQueue(settings.expectedReviewQueue, sessionWrong);
+      addToExpectedReviewQueue(sessionWrong);
+      setPendingReviewKeys(sessionWrong);
+      setResults({
+        correct,
+        wrong,
+        total: activeQuestions.length,
+        isReview: false,
+        reviewRemaining: mergedQueue.length,
+      });
+    } else {
+      const remaining = updateReviewQueueAfterReview(
+        settings.expectedReviewQueue,
+        sessionCorrect,
+      );
+      updateExpectedReviewQueue(sessionCorrect);
+      setPendingReviewKeys(remaining);
+      setResults({
+        correct,
+        wrong,
+        total: activeQuestions.length,
+        isReview: true,
+        reviewRemaining: remaining.length,
+      });
+    }
     setMode('results');
   }
 
+  function handleReviewFromResults() {
+    const keys =
+      pendingReviewKeys.length > 0 ? pendingReviewKeys : settings.expectedReviewQueue;
+    startReview(keys);
+  }
+
   function backToSetup() {
+    setPendingReviewKeys([]);
     setMode('setup');
   }
 
@@ -51,8 +117,9 @@ export function ExpectedQuestionsSection({ onBack }: Props) {
     return (
       <QuizScreen
         key={quizKey}
+        mode={quizMode}
         questions={activeQuestions}
-        onFinish={(correct, wrong) => handleFinish(correct, wrong)}
+        onFinish={handleFinish}
         onProgress={() => {}}
       />
     );
@@ -64,7 +131,10 @@ export function ExpectedQuestionsSection({ onBack }: Props) {
         correct={results.correct}
         wrong={results.wrong}
         total={results.total}
+        isReview={results.isReview}
+        reviewRemaining={results.reviewRemaining}
         onRestart={backToSetup}
+        onReviewWrong={handleReviewFromResults}
       />
     );
   }
@@ -112,6 +182,18 @@ export function ExpectedQuestionsSection({ onBack }: Props) {
             <PlayIcon data-icon="inline-start" />
             {ui.startExpectedQuiz}
           </Button>
+          {reviewCount > 0 && (
+            <Button className="w-full" variant="secondary" size="lg" onClick={() => startReview()}>
+              <AlertCircleIcon data-icon="inline-start" />
+              {ui.reviewWrong}
+              <Badge variant="destructive" className="ms-1">
+                {reviewCount}
+              </Badge>
+            </Button>
+          )}
+          {reviewCount > 0 && (
+            <p className="text-center text-xs text-muted-foreground">{ui.pendingReview(reviewCount)}</p>
+          )}
         </CardFooter>
       </Card>
 

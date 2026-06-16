@@ -177,3 +177,8 @@ export function buildExpectedQuiz(count: number): McqQuestion[] {
   if (count >= all.length) return shuffle(all);
   return shuffle(all).slice(0, count);
 }
+
+export function resolveExpectedQuestions(keys: string[]): McqQuestion[] {
+  const map = new Map(buildExpectedMcqQuestions().map((q) => [q.q, q]));
+  return keys.map((k) => map.get(k)).filter((q): q is McqQuestion => !!q);
+}

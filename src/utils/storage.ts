@@ -29,6 +29,7 @@ export type AppSettings = {
   lastLessonTab: LessonId;
   quizProgress: QuizProgress | null;
   reviewQueue: string[];
+  expectedReviewQueue: string[];
   history: QuizHistoryEntry[];
 };
 
@@ -40,6 +41,7 @@ const DEFAULTS: AppSettings = {
   lastLessonTab: 'basics',
   quizProgress: null,
   reviewQueue: [],
+  expectedReviewQueue: [],
   history: [],
 };
 
@@ -59,6 +61,7 @@ function normalizeSettings(parsed: Partial<AppSettings>): AppSettings {
     ...parsed,
     quizProgress: normalizeProgress(parsed.quizProgress),
     reviewQueue: Array.isArray(parsed.reviewQueue) ? parsed.reviewQueue : [],
+    expectedReviewQueue: Array.isArray(parsed.expectedReviewQueue) ? parsed.expectedReviewQueue : [],
   };
 }
 

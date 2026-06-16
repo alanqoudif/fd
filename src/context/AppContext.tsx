@@ -23,6 +23,8 @@ type AppContextValue = {
   recordResult: (correct: number, wrong: number, total: number) => void;
   addToReviewQueue: (wrongKeys: string[]) => void;
   updateReviewQueue: (sessionCorrect: string[]) => void;
+  addToExpectedReviewQueue: (wrongKeys: string[]) => void;
+  updateExpectedReviewQueue: (sessionCorrect: string[]) => void;
   resetCache: () => void;
 };
 
@@ -57,6 +59,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
         persist({
           reviewQueue: updateReviewQueueAfterReview(settings.reviewQueue, sessionCorrect),
           quizProgress: null,
+        });
+      },
+      addToExpectedReviewQueue: (wrongKeys) => {
+        if (wrongKeys.length === 0) return;
+        persist({
+          expectedReviewQueue: mergeReviewQueue(settings.expectedReviewQueue, wrongKeys),
+        });
+      },
+      updateExpectedReviewQueue: (sessionCorrect) => {
+        persist({
+          expectedReviewQueue: updateReviewQueueAfterReview(
+            settings.expectedReviewQueue,
+            sessionCorrect,
+          ),
         });
       },
       resetCache: () => {
