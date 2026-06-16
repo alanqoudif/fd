@@ -1,16 +1,73 @@
 import { useState } from 'react';
-import { ArrowLeftIcon, ChevronDownIcon } from 'lucide-react';
+import { ArrowLeftIcon, PlayIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { EXPECTED_QUESTION_SECTIONS, MEMORIZE_CONVERSIONS } from '@/data/expectedQuestions';
+import { MEMORIZE_CONVERSIONS } from '@/data/expectedQuestions';
+import { buildExpectedQuiz, getAllExpectedQuestions } from '@/utils/expectedQuiz';
+import type { McqQuestion } from '@/data/questions';
+import { QuizScreen } from '@/components/QuizScreen';
+import { ResultsScreen } from '@/components/ResultsScreen';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 type Props = { onBack: () => void };
 
+type Mode = 'setup' | 'quiz' | 'results';
+
+const COUNTS = [10, 20, 50] as const;
+const TOTAL = getAllExpectedQuestions().length;
+
 export function ExpectedQuestionsSection({ onBack }: Props) {
-  const { settings, ui } = useApp();
-  const lang = settings.explainLang;
+  const { ui } = useApp();
+  const [mode, setMode] = useState<Mode>('setup');
+  const [selectedCount, setSelectedCount] = useState<number>(50);
+  const [quizKey, setQuizKey] = useState(0);
+  const [activeQuestions, setActiveQuestions] = useState<McqQuestion[]>([]);
+  const [results, setResults] = useState({ correct: 0, wrong: 0, total: 0 });
+
+  function startQuiz() {
+    const questions = buildExpectedQuiz(selectedCount);
+    setActiveQuestions(questions);
+    setQuizKey((k) => k + 1);
+    setMode('quiz');
+  }
+
+  function handleFinish(correct: number, wrong: number) {
+    setResults({ correct, wrong, total: activeQuestions.length });
+    setMode('results');
+  }
+
+  function backToSetup() {
+    setMode('setup');
+  }
+
+  if (mode === 'quiz') {
+    return (
+      <QuizScreen
+        key={quizKey}
+        questions={activeQuestions}
+        onFinish={(correct, wrong) => handleFinish(correct, wrong)}
+        onProgress={() => {}}
+      />
+    );
+  }
+
+  if (mode === 'results') {
+    return (
+      <ResultsScreen
+        correct={results.correct}
+        wrong={results.wrong}
+        total={results.total}
+        onRestart={backToSetup}
+      />
+    );
+  }
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -26,21 +83,37 @@ export function ExpectedQuestionsSection({ onBack }: Props) {
         <CardContent className="flex flex-col gap-4">
           <p className="text-sm text-muted-foreground">{ui.expectedQuestionsIntro}</p>
           <div className="tip-box text-sm">{ui.expectedQuestionsTip}</div>
-        </CardContent>
-      </Card>
-
-      {EXPECTED_QUESTION_SECTIONS.map((section) => (
-        <section key={section.id} className="flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-muted-foreground">
-            {lang === 'ar' ? section.titleAr : section.titleEn}
-          </h2>
-          <div className="flex flex-col gap-2">
-            {section.questions.map((item) => (
-              <ExpectedQuestionCard key={item.num} num={item.num} q={item.q} answer={item.answer} />
-            ))}
+          <div>
+            <p className="mb-2 text-sm font-medium">{ui.setupTitle}</p>
+            <ToggleGroup
+              value={[String(selectedCount)]}
+              onValueChange={(v) => {
+                const n = Number(v[0]);
+                if (n === TOTAL || COUNTS.includes(n as (typeof COUNTS)[number])) {
+                  setSelectedCount(n);
+                }
+              }}
+              variant="outline"
+              className="grid w-full grid-cols-2 sm:grid-cols-4"
+            >
+              {COUNTS.map((n) => (
+                <ToggleGroupItem key={n} value={String(n)} className="touch-target h-11 flex-1 sm:h-10">
+                  {n}
+                </ToggleGroupItem>
+              ))}
+              <ToggleGroupItem value={String(TOTAL)} className="touch-target h-11 flex-1 sm:h-10">
+                {ui.all} ({TOTAL})
+              </ToggleGroupItem>
+            </ToggleGroup>
           </div>
-        </section>
-      ))}
+        </CardContent>
+        <CardFooter className="flex flex-col gap-2 border-t-0 bg-transparent pt-0">
+          <Button className="touch-target w-full" size="lg" onClick={startQuiz}>
+            <PlayIcon data-icon="inline-start" />
+            {ui.startExpectedQuiz}
+          </Button>
+        </CardFooter>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -52,38 +125,6 @@ export function ExpectedQuestionsSection({ onBack }: Props) {
       </Card>
 
       <p className="pb-2 text-center text-sm text-muted-foreground">{ui.expectedQuestionsFooter}</p>
-    </div>
-  );
-}
-
-function ExpectedQuestionCard({ num, q, answer }: { num: number; q: string; answer: string }) {
-  const { ui } = useApp();
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="expected-question-card">
-      <button
-        type="button"
-        className="expected-question-trigger"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-      >
-        <span className="expected-question-num">{num}.</span>
-        <span className="flex-1 text-start">{q}</span>
-        <ChevronDownIcon
-          className={cn('size-4 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')}
-        />
-      </button>
-      {open ? (
-        <div className="expected-question-answer">
-          <span className="text-xs font-medium text-muted-foreground">{ui.answerLabel}</span>
-          <span>{answer}</span>
-        </div>
-      ) : (
-        <button type="button" className="expected-question-reveal touch-target" onClick={() => setOpen(true)}>
-          {ui.showAnswer}
-        </button>
-      )}
     </div>
   );
 }

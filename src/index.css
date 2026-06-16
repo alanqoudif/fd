@@ -213,22 +213,6 @@
     @apply mb-1 block text-primary;
   }
 
-  .expected-question-card {
-    @apply flex flex-col gap-2 rounded-xl border bg-card p-3;
-  }
-  .expected-question-trigger {
-    @apply flex w-full items-start gap-2 text-start text-sm;
-  }
-  .expected-question-num {
-    @apply shrink-0 font-medium tabular-nums text-muted-foreground;
-  }
-  .expected-question-reveal {
-    @apply self-start rounded-md px-2 py-1 text-xs font-medium text-primary hover:bg-muted;
-  }
-  .expected-question-answer {
-    @apply flex flex-col gap-1 rounded-lg border bg-muted/50 p-3 text-sm;
-  }
-
   .visual-explain {
     direction: ltr;
     text-align: left;
