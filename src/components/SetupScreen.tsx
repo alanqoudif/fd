@@ -1,4 +1,4 @@
-import { BookOpenIcon, PlayIcon, RotateCcwIcon, AlertCircleIcon } from 'lucide-react';
+import { BookOpenIcon, ClipboardListIcon, PlayIcon, RotateCcwIcon, AlertCircleIcon } from 'lucide-react';
 import { GithubIcon } from '@/components/icons/github-icon';
 import { useApp } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ type Props = {
   onResumeQuiz: () => void;
   onStartReview: () => void;
   onOpenConvert: () => void;
+  onOpenExpected: () => void;
 };
 
 const COUNTS = [10, 20, 50, 200] as const;
@@ -32,6 +33,7 @@ export function SetupScreen({
   onResumeQuiz,
   onStartReview,
   onOpenConvert,
+  onOpenExpected,
 }: Props) {
   const { settings, ui, setQuestionCount, resetCache } = useApp();
   const progress = settings.quizProgress;
@@ -114,6 +116,10 @@ export function SetupScreen({
           <Button className="w-full" variant="outline" onClick={onOpenConvert}>
             <BookOpenIcon data-icon="inline-start" />
             {ui.learnConversions}
+          </Button>
+          <Button className="w-full" variant="outline" onClick={onOpenExpected}>
+            <ClipboardListIcon data-icon="inline-start" />
+            {ui.expectedQuestions}
           </Button>
         </CardFooter>
       </Card>

@@ -56,6 +56,14 @@ type Strings = {
   reviewLesson: string;
   openSource: string;
   openSourceAria: string;
+  expectedQuestions: string;
+  expectedQuestionsTitle: string;
+  expectedQuestionsIntro: string;
+  expectedQuestionsTip: string;
+  expectedQuestionsFooter: string;
+  memorizeTitle: string;
+  showAnswer: string;
+  answerLabel: string;
 };
 
 const UI: Record<'ar' | 'en', Strings> = {
@@ -115,6 +123,16 @@ const UI: Record<'ar' | 'en', Strings> = {
     pendingReview: (n) => `${n} سؤال محفوظ للمراجعة`,
     openSource: 'مفتوح المصدر',
     openSourceAria: 'عرض المشروع على GitHub',
+    expectedQuestions: 'الأسئلة المتوقعة',
+    expectedQuestionsTitle: '50 سؤال متوقع للتدريب',
+    expectedQuestionsIntro: 'جاوب عليهم كأنك في الاختبار، وبعدها راجع الإجابة تحت كل سؤال.',
+    expectedQuestionsTip:
+      'أسلوب المعلم واضح: يكرر نفس الفكرة لكن يغير الرقم أو المصطلح. ركّز على التحويلات + الاختصارات + وظيفة كل قطعة.',
+    expectedQuestionsFooter:
+      'التحويلات والاختصارات والمكونات تكررت كثير — راح تغطي نسبة كبيرة من الاختبار.',
+    memorizeTitle: 'أهم 10 تحفظهم حرفيًا',
+    showAnswer: 'عرض الإجابة',
+    answerLabel: 'الإجابة:',
   },
   en: {
     appTitle: 'Computer Hardware Quiz',
@@ -172,6 +190,16 @@ const UI: Record<'ar' | 'en', Strings> = {
     pendingReview: (n) => `${n} saved for review`,
     openSource: 'Open Source',
     openSourceAria: 'View project on GitHub',
+    expectedQuestions: 'Expected Questions',
+    expectedQuestionsTitle: '50 Expected Practice Questions',
+    expectedQuestionsIntro: 'Answer as if you are in the exam, then review the answer under each question.',
+    expectedQuestionsTip:
+      'The teacher repeats the same idea but changes the number or term. Focus on conversions, abbreviations, and what each component does.',
+    expectedQuestionsFooter:
+      'Conversions, abbreviations, and components appear often — they cover a large part of the exam.',
+    memorizeTitle: 'Top 10 to memorize exactly',
+    showAnswer: 'Show answer',
+    answerLabel: 'Answer:',
   },
 };
 

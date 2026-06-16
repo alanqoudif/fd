@@ -7,11 +7,12 @@ import { SetupScreen } from '@/components/SetupScreen';
 import { QuizScreen } from '@/components/QuizScreen';
 import { ResultsScreen } from '@/components/ResultsScreen';
 import { ConvertSection } from '@/components/ConvertSection';
+import { ExpectedQuestionsSection } from '@/components/ExpectedQuestionsSection';
 import { AppProvider, useApp } from '@/context/AppContext';
 import type { QuizMode, QuizProgress } from '@/utils/storage';
 import { mergeReviewQueue, updateReviewQueueAfterReview } from '@/utils/storage';
 
-type Screen = 'setup' | 'quiz' | 'results' | 'convert';
+type Screen = 'setup' | 'quiz' | 'results' | 'convert' | 'expected';
 
 function questionKey(q: McqQuestion) {
   return q.q;
@@ -168,6 +169,7 @@ function AppInner() {
             onResumeQuiz={resumeQuiz}
             onStartReview={() => startReview(settings.reviewQueue)}
             onOpenConvert={() => setScreen('convert')}
+            onOpenExpected={() => setScreen('expected')}
           />
         )}
         {screen === 'quiz' && (
@@ -196,6 +198,7 @@ function AppInner() {
           />
         )}
         {screen === 'convert' && <ConvertSection onBack={() => setScreen('setup')} />}
+        {screen === 'expected' && <ExpectedQuestionsSection onBack={() => setScreen('setup')} />}
       </main>
     </div>
   );
